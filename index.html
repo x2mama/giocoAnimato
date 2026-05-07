@@ -16,8 +16,19 @@
             <button id="btnRight" type="button">Destra</button>
         </div>
     </div>
-    <script src="script.js"></script>
     <script src="sprite.js"></script>
+    <script src="World.js"></script>
+    <script src="Player.js"></script>
+    <script src="GameArea.js"></script>
+    <script src="InputController.js"></script>
+    <script src="game.js"></script>
+    <script>
+      let game;
+      function startGame() {
+        game = new Game(running);
+        game.start();
+      }
+    </script>
     
 </body>
 </html>
