@@ -1,3 +1,6 @@
+/**
+ * Gestisce input da tastiera: movimento (WASD/frecce) e interazione (E).
+ */
 class InputController {
   constructor(player) {
     this.player = player;
@@ -7,60 +10,65 @@ class InputController {
       up: false,
       down: false
     };
-
-    this.keyboardBound = false;
+    this.onInteract = null;
   }
 
-  setControlDirection(direction, pressed) {
+  setupControls() {
+    window.addEventListener("keydown", (event) => this.handleKey(event, true));
+    window.addEventListener("keyup", (event) => this.handleKey(event, false));
+  }
+
+  /**
+   * Click sinistro sul canvas: coordinate schermo passate al callback.
+   * Tiene conto del ridimensionamento CSS del canvas.
+   */
+  setupMouseShoot(canvas, onShoot) {
+    canvas.addEventListener("mousedown", (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const screenX = (event.clientX - rect.left) * scaleX;
+      const screenY = (event.clientY - rect.top) * scaleY;
+
+      onShoot(screenX, screenY);
+    });
+  }
+
+  handleKey(event, pressed) {
+    const key = event.key.toLowerCase();
+
+    if (key === "e" && pressed && this.onInteract) {
+      event.preventDefault();
+      this.onInteract();
+      return;
+    }
+
+    const direction = this.getDirectionFromKey(key);
+    if (!direction) {
+      return;
+    }
+
+    event.preventDefault();
     this.controlsState[direction] = pressed;
     this.updatePlayerSpeed();
   }
 
   updatePlayerSpeed() {
-    const speedX = (this.controlsState.right ? this.player.speedStep : 0) - 
-                   (this.controlsState.left ? this.player.speedStep : 0);
-    const speedY = (this.controlsState.down ? this.player.speedStep : 0) - 
-                   (this.controlsState.up ? this.player.speedStep : 0);
-    
+    const speedX =
+      (this.controlsState.right ? this.player.speedStep : 0) -
+      (this.controlsState.left ? this.player.speedStep : 0);
+    const speedY =
+      (this.controlsState.down ? this.player.speedStep : 0) -
+      (this.controlsState.up ? this.player.speedStep : 0);
     this.player.setSpeed(speedX, speedY);
   }
 
-  setupControls() {
-    this.wireControl("btnLeft", "left");
-    this.wireControl("btnRight", "right");
-    this.wireControl("btnUp", "up");
-    this.wireControl("btnDown", "down");
-
-    if (!this.keyboardBound) {
-      this.setupKeyboardControls();
-      this.keyboardBound = true;
-    }
-  }
-
-  setupKeyboardControls() {
-    window.addEventListener("keydown", (event) => {
-      const direction = this.getDirectionFromKey(event.key);
-      if (!direction) {
-        return;
-      }
-
-      event.preventDefault();
-      this.setControlDirection(direction, true);
-    });
-
-    window.addEventListener("keyup", (event) => {
-      const direction = this.getDirectionFromKey(event.key);
-      if (!direction) {
-        return;
-      }
-
-      event.preventDefault();
-      this.setControlDirection(direction, false);
-    });
-  }
-
   getDirectionFromKey(key) {
-    switch (key.toLowerCase()) {
+    switch (key) {
       case "a":
       case "arrowleft":
         return "left";
@@ -76,28 +84,5 @@ class InputController {
       default:
         return null;
     }
-  }
-
-  wireControl(buttonId, direction) {
-    const button = document.getElementById(buttonId);
-    if (!button) {
-      return;
-    }
-
-    const handlePress = () => this.setControlDirection(direction, true);
-    const handleRelease = () => this.setControlDirection(direction, false);
-
-    // Mouse events
-    button.addEventListener("mousedown", handlePress);
-    button.addEventListener("mouseup", handleRelease);
-    button.addEventListener("mouseleave", handleRelease);
-
-    // Touch events
-    button.addEventListener("touchstart", (event) => {
-      event.preventDefault();
-      handlePress();
-    }, { passive: false });
-    button.addEventListener("touchend", handleRelease);
-    button.addEventListener("touchcancel", handleRelease);
   }
 }

@@ -1,34 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <title>Gioco Animato</title>
 </head>
 <body onload="startGame()">
-    <div id="gameContainer"></div>
-    <div id="controls" aria-label="Controlli movimento">
-        <button id="btnUp" type="button">Su</button>
-        <div class="row">
-            <button id="btnLeft" type="button">Sinistra</button>
-            <button id="btnDown" type="button">Giu</button>
-            <button id="btnRight" type="button">Destra</button>
-        </div>
+    <p id="monsterCounter" class="monster-counter">Mostri rimasti: 30</p>
+    <div class="game-wrapper">
+        <div id="gameContainer"></div>
+        <p id="deathMessage" class="death-message">Sei morto</p>
     </div>
-    <script src="sprite.js"></script>
+    <p class="controls-hint">WASD o frecce per muoverti · E per raccogliere un'arma · Click sinistro per sparare verso il cursore</p>
+
+    <script src="Obstacle.js"></script>
+    <script src="Tree.js"></script>
     <script src="World.js"></script>
+    <script src="Weapon.js"></script>
+    <script src="Bullet.js"></script>
+    <script src="Hud.js"></script>
+    <script src="sprite.js"></script>
     <script src="Player.js"></script>
+    <script src="Monster.js"></script>
     <script src="GameArea.js"></script>
     <script src="InputController.js"></script>
     <script src="game.js"></script>
     <script>
       let game;
+
       function startGame() {
-        game = new Game(running);
+        game = new Game();
         game.start();
       }
     </script>
-    
 </body>
 </html>
